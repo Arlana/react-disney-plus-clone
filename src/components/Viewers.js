@@ -37,6 +37,7 @@ const Wrap = styled.div`
 
     border: 3px solid rgb(249, 249, 249, 0.1); 
     border-radius: 10px;
+    overflow: hidden;
     box-shadow: rgb(0 0 0 / 69%) 0px 26px 30px -10px, rgb(0 0 0 /73%) 0px 16px 10px -10px;
     // transition-duration: 300ms;
     cursor: pointer;
