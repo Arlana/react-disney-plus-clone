@@ -1,43 +1,122 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import styled from 'styled-components';
+import { selectUserName, selectUserPhoto, setSignOut, setUserLogin } from "../features/user/userSlice";
+import { useDispatch, useSelector } from 'react-redux';
+import { auth, provider } from '../firebase';
+import { useHistory } from 'react-router';
 
 function Header() {
+    const dispatch = useDispatch();
+    const history = useHistory();
+    const userName = useSelector(selectUserName);
+    const userPhoto = useSelector(selectUserPhoto);
+
+    useEffect(() => {
+        auth.onAuthStateChanged(async (user) => {
+            if(user) {
+                dispatch(setUserLogin({
+                    name: user.displayName,
+                    email: user.email,
+                    photo: user.userURL,
+                }))
+                history.push("/")
+            }
+        })
+    }, [])
+
+    const signIn = () => {
+        auth.signInWithPopup(provider)
+        .then((result) => {
+            console.log(result);
+            let user = result.user;
+
+            dispatch(setUserLogin({
+                name: user.displayName,
+                email: user.email,
+                photo: user.userURL,
+            }))
+            history.push("/")
+        })
+    }
+
+    const signOut = () => {
+        auth.signOut()
+        .then(() => {
+            dispatch(setSignOut());
+            history.push("/login")
+        })
+    }
+
     return (
         <Nav>
             <Logo src ="/images/logo.svg" />
-            <NavMenu>
-                <a href="">
-                    <img src="/images/home-icon.svg" alt="" />
-                    <span>HOME</span>
-                </a>
-                <a href="">
-                    <img src="/images/search-icon.svg" alt="" />
-                    <span>SEARCH</span>
-                </a>
-                <a href="">
-                    <img src="/images/watchlist-icon.svg" alt="" />
-                    <span>WATCHLIST</span>
-                </a>
-                <a href="">
-                    <img src="/images/original-icon.svg" alt="" />
-                    <span>ORIGINALS</span>
-                </a>
-                <a href="">
-                    <img src="/images/movie-icon.svg" alt="" />
-                    <span>MOVIES</span>
-                </a>
-                <a href="">
-                    <img src="/images/series-icon.svg" alt="" />
-                    <span>SERIES</span>
-                </a>
-            </NavMenu>
 
-            <UserImg src ="/images/selfy.jpg"/>
+            {!userName ? (
+                <LoginContainer>
+                    <Login onClick = {signIn}>Login</Login>
+                </LoginContainer>
+                ) :
+
+                <>
+                    <NavMenu>
+                        <a href="">
+                            <img src="/images/home-icon.svg" alt="" />
+                            <span>HOME</span>
+                        </a>
+                        <a href="">
+                            <img src="/images/search-icon.svg" alt="" />
+                            <span>SEARCH</span>
+                        </a>
+                        <a href="">
+                            <img src="/images/watchlist-icon.svg" alt="" />
+                            <span>WATCHLIST</span>
+                        </a>
+                        <a href="">
+                            <img src="/images/original-icon.svg" alt="" />
+                            <span>ORIGINALS</span>
+                        </a>
+                        <a href="">
+                            <img src="/images/movie-icon.svg" alt="" />
+                            <span>MOVIES</span>
+                        </a>
+                        <a href="">
+                            <img src="/images/series-icon.svg" alt="" />
+                            <span>SERIES</span>
+                        </a>
+                    </NavMenu>
+
+                    <UserImg onClick={signOut} src ="/images/selfy.jpg"/>
+                </>
+            }
+
         </Nav>
     )
 }
 
 export default Header
+
+const LoginContainer = styled.div`
+    flex: 1;
+    display: flex;
+    justify-content: flex-end;
+`
+
+const Login = styled.div`
+    border: 1px solid #f9f9f9;
+    padding: 8px 16px;
+    border-radius: 4px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    background-color: rgba(0, 0, 0, 0.6);
+    transition: all 0.2s ease 0s;
+    cursor: pointer;
+
+    &:hover {
+        background-color: #f9f9f9;
+        color: #000;
+        border-color: transparent;
+    }
+`
 
 const Nav = styled.nav`
     overflow-x: hidden;

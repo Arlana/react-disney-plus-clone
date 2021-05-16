@@ -1,5 +1,6 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { selectMovies } from '../features/movie/movieSlice';
 
@@ -9,12 +10,14 @@ function Movies() {
 
     return (
         <Container>
-            <h4>Recomended for You</h4>
+            <h2>Recomended for You</h2>
             <Content>
                 {movies &&
                     movies.map((movie) => (
                         <Wrap key={movie.id}>
-                            <img src={movie.cardImg} />
+                            <Link to={`/detail/${movie.id}`}>
+                                <img src={movie.cardImg} />
+                            </Link>
                         </Wrap>
                     ))
                 }
@@ -33,10 +36,11 @@ const Content = styled.div`
     display: grid;
     grid-gap: 25px;
     grid-template-columns: repeat(4, minmax(0, 1fr));
+    margin-top: 20px;
 `
 
 const Wrap = styled.div`
-    border-radius: 20px;
+    border-radius: 10px;
     cursor: pointer;
     overflow: hidden;
     border: 3px solid rgba(249, 249, 249, 0.1);
